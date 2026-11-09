@@ -1,0 +1,196 @@
+iso3,pais,grupo_hdi,regiao_undp
+AFG,Afghanistan,Low,SA
+AGO,Angola,Medium,SSA
+ALB,Albania,High,ECA
+AND,Andorra,Very High,
+ARE,United Arab Emirates,Very High,AS
+ARG,Argentina,Very High,LAC
+ARM,Armenia,High,ECA
+ATG,Antigua and Barbuda,High,LAC
+AUS,Australia,Very High,
+AUT,Austria,Very High,
+AZE,Azerbaijan,High,ECA
+BDI,Burundi,Low,SSA
+BEL,Belgium,Very High,
+BEN,Benin,Low,SSA
+BFA,Burkina Faso,Low,SSA
+BGD,Bangladesh,Medium,SA
+BGR,Bulgaria,High,
+BHR,Bahrain,Very High,AS
+BHS,Bahamas,Very High,LAC
+BIH,Bosnia and Herzegovina,High,ECA
+BLR,Belarus,Very High,ECA
+BLZ,Belize,Medium,LAC
+BOL,Bolivia,Medium,LAC
+BRA,Brazil,High,LAC
+BRB,Barbados,High,LAC
+BRN,Brunei,Very High,EAP
+BTN,Bhutan,Medium,SA
+BWA,Botswana,Medium,SSA
+CAF,Central African Republic,Low,SSA
+CAN,Canada,Very High,
+CHE,Switzerland,Very High,
+CHL,Chile,Very High,LAC
+CHN,China,High,EAP
+CIV,Ivory Coast,Medium,SSA
+CMR,Cameroon,Medium,SSA
+COD,The Democratic Republic of the Congo,Low,SSA
+COG,Congo,Medium,SSA
+COL,Colombia,High,LAC
+COM,Comoros,Medium,SSA
+CPV,Cabo Verde,Medium,SSA
+CRI,Costa Rica,Very High,LAC
+CUB,Cuba,High,LAC
+CYP,Cyprus,Very High,
+CZE,Czechia,Very High,
+DEU,Germany,Very High,
+DJI,Djibouti,Low,AS
+DMA,Dominica,High,LAC
+DNK,Denmark,Very High,
+DOM,Dominican Republic,High,LAC
+DZA,Algeria,High,AS
+ECU,Ecuador,High,LAC
+EGY,Egypt,High,AS
+ERI,Eritrea,Low,SSA
+ESP,Spain,Very High,
+EST,Estonia,Very High,
+ETH,Ethiopia,Low,SSA
+FIN,Finland,Very High,
+FJI,Fiji,High,EAP
+FRA,France,Very High,
+FSM,Micronesia,Medium,EAP
+GAB,Gabon,High,SSA
+GBR,United Kingdom,Very High,
+GEO,Georgia,Very High,ECA
+GHA,Ghana,Medium,SSA
+GIN,Guinea,Low,SSA
+GMB,Gambia,Low,SSA
+GNB,Guinea-Bissau,Low,SSA
+GNQ,Equatorial Guinea,Medium,SSA
+GRC,Greece,Very High,
+GRD,Grenada,High,LAC
+GTM,Guatemala,Medium,LAC
+GUY,Guyana,High,LAC
+HKG,Hong Kong,Very High,
+HND,Honduras,Medium,LAC
+HRV,Croatia,Very High,
+HTI,Haiti,Low,LAC
+HUN,Hungary,Very High,
+IDN,Indonesia,High,EAP
+IND,India,Medium,SA
+IRL,Ireland,Very High,
+IRN,Iran,High,SA
+IRQ,Iraq,Medium,AS
+ISL,Iceland,Very High,
+ISR,Israel,Very High,
+ITA,Italy,Very High,
+JAM,Jamaica,High,LAC
+JOR,Jordan,High,AS
+JPN,Japan,Very High,
+KAZ,Kazakhstan,Very High,ECA
+KEN,Kenya,Medium,SSA
+KGZ,Kyrgyzstan,Medium,ECA
+KHM,Cambodia,Medium,EAP
+KIR,Kiribati,Medium,EAP
+KNA,Saint Kitts and Nevis,High,LAC
+KOR,South Korea,Very High,
+KWT,Kuwait,Very High,AS
+LAO,Lao,Medium,EAP
+LBN,Lebanon,High,AS
+LBR,Liberia,Low,SSA
+LBY,Libya,High,AS
+LCA,Saint Lucia,High,LAC
+LIE,Liechtenstein,Very High,
+LKA,Sri Lanka,High,SA
+LSO,Lesotho,Low,SSA
+LTU,Lithuania,Very High,
+LUX,Luxembourg,Very High,
+LVA,Latvia,Very High,
+MAR,Morocco,Medium,AS
+MCO,Monaco,,
+MDA,Moldova,High,ECA
+MDG,Madagascar,Low,SSA
+MDV,Maldives,High,SA
+MEX,Mexico,High,LAC
+MHL,Marshall Islands,Medium,EAP
+MKD,North Macedonia,High,ECA
+MLI,Mali,Low,SSA
+MLT,Malta,Very High,
+MMR,Myanmar,Medium,EAP
+MNE,Montenegro,Very High,ECA
+MNG,Mongolia,High,EAP
+MOZ,Mozambique,Low,SSA
+MRT,Mauritania,Medium,SSA
+MUS,Mauritius,Very High,SSA
+MWI,Malawi,Low,SSA
+MYS,Malaysia,Very High,EAP
+NAM,Namibia,Medium,SSA
+NER,Niger,Low,SSA
+NGA,Nigeria,Low,SSA
+NIC,Nicaragua,Medium,LAC
+NLD,Netherlands,Very High,
+NOR,Norway,Very High,
+NPL,Nepal,Medium,SA
+NRU,Nauru,,EAP
+NZL,New Zealand,Very High,
+OMN,Oman,Very High,AS
+PAK,Pakistan,Low,SA
+PAN,Panama,Very High,LAC
+PER,Peru,High,LAC
+PHL,Philippines,Medium,EAP
+PLW,Palau,High,EAP
+PNG,Papua New Guinea,Medium,EAP
+POL,Poland,Very High,
+PRK,North Korea,,EAP
+PRT,Portugal,Very High,
+PRY,Paraguay,High,LAC
+PSE,"Palestine, State of",High,AS
+QAT,Qatar,Very High,AS
+ROU,Romania,Very High,
+RUS,Russian Federation,Very High,
+RWA,Rwanda,Low,SSA
+SAU,Saudi Arabia,Very High,AS
+SDN,Sudan,Low,AS
+SEN,Senegal,Low,SSA
+SGP,Singapore,Very High,EAP
+SLB,Solomon Islands,Medium,EAP
+SLE,Sierra Leone,Low,SSA
+SLV,El Salvador,Medium,LAC
+SMR,San Marino,Very High,
+SOM,Somalia,,AS
+SRB,Serbia,Very High,ECA
+SSD,South Sudan,Low,SSA
+STP,Sao Tome and Principe,Medium,SSA
+SUR,Suriname,High,LAC
+SVK,Slovakia,Very High,
+SVN,Slovenia,Very High,
+SWE,Sweden,Very High,
+SWZ,Eswatini,Medium,SSA
+SYC,Seychelles,High,SSA
+SYR,Syrian Arab Republic,Medium,AS
+TCD,Chad,Low,SSA
+TGO,Togo,Low,SSA
+THA,Thailand,Very High,EAP
+TJK,Tajikistan,Medium,ECA
+TKM,Turkmenistan,High,ECA
+TLS,Timor-Leste,Medium,EAP
+TON,Tonga,High,EAP
+TTO,Trinidad and Tobago,Very High,LAC
+TUN,Tunisia,High,AS
+TUR,Turkey,Very High,ECA
+TUV,Tuvalu,Medium,EAP
+TZA,Tanzania,Low,SSA
+UGA,Uganda,Low,SSA
+UKR,Ukraine,High,ECA
+URY,Uruguay,Very High,LAC
+USA,United States,Very High,
+UZB,Uzbekistan,High,ECA
+VCT,Saint Vincent and the Grenadines,High,LAC
+VEN,Venezuela,Medium,LAC
+VNM,Viet Nam,High,EAP
+VUT,Vanuatu,Medium,EAP
+WSM,Samoa,High,EAP
+YEM,Yemen,Low,AS
+ZAF,South Africa,High,SSA
+ZMB,Zambia,Medium,SSA
+ZWE,Zimbabwe,Medium,SSA

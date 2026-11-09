@@ -1,0 +1,36 @@
+indicador_id,indicador,unidade,categoria
+1,"Adolescent Birth Rate (births per 1,000 women ages 15-19)",nascimentos / 1.000 mulheres 15-19,Saúde
+2,Carbon dioxide emissions per capita (production) (tonnes),toneladas/capita,Meio ambiente
+3,Coefficient of human inequality,percentual (%),Desigualdade
+4,Difference from HDI rank,posições,Síntese
+5,Difference from HDI value (%),percentual (%),Síntese
+6,Expected Years of Schooling,anos,Educação
+7,"Expected Years of Schooling, female",anos,Educação
+8,"Expected Years of Schooling, male",anos,Educação
+9,GDI Group,categoria,Gênero
+10,GII Rank,posição,Gênero
+11,Gender Development Index,índice (0-1),Gênero
+12,Gender Inequality Index,índice (0-1),Gênero
+13,Gross National Income Per Capita,US$ PPC,Renda
+14,"Gross National Income Per Capita, female",US$ PPC,Renda
+15,"Gross National Income Per Capita, male",US$ PPC,Renda
+16,HDI Rank,posição (1-195),Síntese
+17,HDI female,índice (0-1),Gênero
+18,HDI male,índice (0-1),Gênero
+19,Human Development Index,índice (0-1),Síntese
+20,Inequality in eduation,percentual (%),Desigualdade
+21,Inequality in income,percentual (%),Desigualdade
+22,Inequality in life expectancy,percentual (%),Desigualdade
+23,Inequality-adjusted Human Development Index,índice (0-1),Síntese
+24,"Labour force participation rate, female (% ages 15 and older)",percentual (%),Trabalho
+25,"Labour force participation rate, male (% ages 15 and older)",percentual (%),Trabalho
+26,Life Expectancy at Birth,anos,Saúde
+27,"Life Expectancy at Birth, female",anos,Saúde
+28,"Life Expectancy at Birth, male",anos,Saúde
+29,Material footprint per capita (tonnes),toneladas/capita,Meio ambiente
+30,"Maternal Mortality Ratio (deaths per 100,000 live births)",óbitos / 100.000 nascidos vivos,Saúde
+31,Mean Years of Schooling,anos,Educação
+32,"Mean Years of Schooling, female",anos,Educação
+33,"Mean Years of Schooling, male",anos,Educação
+34,Overall loss (%),percentual (%),Síntese
+35,Planetary pressures-adjusted Human Development Index,índice (0-1),Síntese

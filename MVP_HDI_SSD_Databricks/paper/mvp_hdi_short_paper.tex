@@ -1,0 +1,177 @@
+\documentclass[11pt,a4paper]{article}
+
+% ===================== PACOTES =====================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% Observação: este ambiente de compilação não possui os padrões de
+% hifenização do pacote babel para português instalados. Em vez de
+% depender de babel (que falharia por falta desses padrões), define-se
+% manualmente o rótulo do resumo; o texto permanece integralmente em
+% português. No Overleaf, os padrões de português estão disponíveis
+% por padrão, então \usepackage[portuguese]{babel} pode ser reativado
+% caso se deseje hifenização automática em português (ver instruções
+% no guia de Overleaf).
+\renewcommand{\abstractname}{Resumo}
+\usepackage{geometry}
+\geometry{margin=2.2cm}
+\usepackage{setspace}
+\singlespacing
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{indentfirst}
+\usepackage[sort&compress]{natbib}
+\setlength{\parskip}{3pt}
+\setlength{\bibsep}{1pt}
+
+% ===================== METADADOS =====================
+\title{\textbf{Pipeline de Dados em Nuvem para Apoio à Decisão sobre Desenvolvimento Humano: do IDH Bruto à Modelagem Preditiva e à Análise de Mobilidade}}
+\author{Luíza Doniak \\ \small Disciplina: Sistemas de Suporte à Decisão (SSD) --- Prof. André Serrano \\ \small Universidade de Brasília (UnB)}
+\date{Novembro de 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent Este trabalho descreve a construção e a validação de um \textit{Minimum Viable Product} (MVP) de pipeline de dados orientado à decisão, utilizando o conjunto de dados público do Índice de Desenvolvimento Humano (IDH) divulgado pelo Programa das Nações Unidas para o Desenvolvimento (PNUD). O projeto parte de uma modelagem preditiva já existente, que compara uma regra de decisão tradicional com dois modelos de aprendizado de máquina para classificar países por nível de desenvolvimento humano, e avança em três frentes: (i) reestruturação dos dados em arquitetura de camadas (\textit{bronze}, \textit{silver}, \textit{gold}) com modelagem em esquema estrela, preparada para persistência em nuvem (Databricks); (ii) auditoria de qualidade de dados em seis dimensões (completude, unicidade, consistência, conformidade, acurácia e atualidade); e (iii) uma análise longitudinal inédita sobre mobilidade de grupos de IDH entre 1990 e 2021, testando a associação entre desigualdade sustentada e progresso no desenvolvimento humano. Os resultados indicam que os modelos de aprendizado de máquina superam a regra tradicional em até 19,3 pontos percentuais de acurácia, que a base apresenta qualidade elevada (88,3\% de completude, zero inconsistências estruturais), e que a desigualdade de longo prazo está fortemente correlacionada ao nível final de desenvolvimento (correlação de Spearman $\rho = -0,842$; $p < 0,001$), embora a diferença de médias entre grupos de mobilidade não tenha atingido significância estatística ao nível de 5\% ($p = 0,084$), um resultado discutido criticamente à luz da distinção entre correlação e causalidade.
+\end{abstract}
+
+\vspace{0.3cm}
+\noindent\textbf{Palavras-chave:} Sistemas de Suporte à Decisão; Qualidade de Dados; Índice de Desenvolvimento Humano; Aprendizado de Máquina; Arquitetura em Camadas.
+
+\section{Introdução}
+
+A tomada de decisão em políticas de desenvolvimento humano exige transformar grandes volumes de indicadores socioeconômicos em evidência utilizável. O Índice de Desenvolvimento Humano (IDH), calculado anualmente pelo PNUD a partir de três dimensões --- saúde, educação e renda --- é um exemplo típico de problema semiestruturado no sentido definido por \citet{gorry1971}: a decisão de classificar, comparar ou priorizar países não segue uma regra fechada e determinística, mas também não é puramente subjetiva, pois depende de dados quantitativos, limiares definidos e modelos analíticos.
+
+Este trabalho tem origem em um projeto anterior, desenvolvido na disciplina de Ciência de Dados, no qual foram comparadas duas abordagens de classificação de países por grupo de desenvolvimento humano: uma regra de decisão tradicional, baseada diretamente nos limiares oficiais do PNUD aplicados ao valor do IDH, e dois modelos de aprendizado de máquina (Regressão Logística e \textit{Random Forest}) treinados sobre os demais indicadores da base. O presente trabalho retoma essa análise e a insere em um problema mais amplo: o de construir, documentar e avaliar um pipeline de dados completo --- da coleta à persistência em nuvem --- que sustente a decisão de forma auditável, reprodutível e criticamente avaliada.
+
+O objetivo geral deste MVP é responder a quatro perguntas de negócio específicas: (1) um modelo de aprendizado de máquina classifica países por nível de desenvolvimento humano com mais acurácia do que a regra tradicional baseada apenas no valor do IDH? (2) quais indicadores mais contribuem para essa classificação? (3) a desigualdade sustentada ao longo do tempo está associada à mobilidade de um país entre grupos de desenvolvimento humano? e (4) os dados disponíveis são suficientemente confiáveis para sustentar as três respostas anteriores? As três primeiras perguntas definem o escopo analítico; a quarta, frequentemente omitida em trabalhos de ciência de dados, é tratada aqui como pré-condição de validade das demais, seguindo o princípio de que nenhum modelo pode ser mais confiável do que os dados que o alimentam.
+
+A contribuição específica deste trabalho em relação ao projeto original é dupla. Em primeiro lugar, o pipeline de dados foi redesenhado como uma arquitetura em três camadas (\textit{bronze}, \textit{silver}, \textit{gold}), com modelagem dimensional em esquema estrela, de modo a tornar a origem, a transformação e a granularidade de cada dado auditáveis --- uma lacuna identificada no projeto original, que operava diretamente sobre o arquivo CSV largo (\textit{wide format}), sem camada intermediária documentada. Em segundo lugar, foi incorporada uma análise que o formato largo original não permitia realizar de forma direta: uma leitura longitudinal da trajetória de 141 países entre 1990 e 2021, testando se a desigualdade sustentada no período está associada à permanência ou à mobilidade entre grupos de desenvolvimento humano. Essa extensão foi motivada justamente pela reestruturação dos dados em formato longo, que viabiliza consultas por país e por ano de forma nativa.
+
+\section{Revisão Curta}
+
+A literatura e o material de referência utilizados neste trabalho organizam-se em três eixos, que correspondem às três etapas do próprio pipeline construído: a definição do problema de decisão, a quantificação da incerteza sobre a evidência disponível, e a preparação técnica dos dados que sustentam essa evidência.
+
+\subsection{Sistemas de Suporte à Decisão e problemas semiestruturados}
+
+\citet{simon1960} descreve a decisão como um processo de quatro fases --- inteligência (identificação do problema), concepção (geração de alternativas), escolha (avaliação e seleção) e implementação (execução e retroalimentação) --- e introduz o conceito de racionalidade limitada: diante de informação finita e tempo escasso, decisores tendem a aceitar soluções satisfatórias (\textit{satisficing}) em vez de ótimas. \citet{gorry1971} complementam esse modelo com uma matriz que cruza o tipo de decisão (operacional, tática, estratégica) com o grau de estruturação do problema (estruturado, semiestruturado, não estruturado), estabelecendo que sistemas de suporte à decisão (SSD) são mais úteis exatamente na zona semiestruturada, onde dados e modelos auxiliam, mas não substituem, o julgamento humano. Essa classificação justifica a escolha metodológica deste trabalho: o problema de classificar e comparar trajetórias de desenvolvimento humano entre países não é redutível a uma fórmula única, mas também não pode ser resolvido sem evidência quantitativa estruturada.
+
+A arquitetura de referência de um SSD, segundo Sprague e Carlson, prevê quatro subsistemas integrados: gestão de dados, gestão de modelos, interface com o usuário e base de conhecimento. O pipeline aqui construído corresponde, em escala reduzida, exatamente a essa arquitetura: a camada de dados (\textit{bronze/silver/gold}) cumpre a função de gestão de dados; os modelos estatísticos e de aprendizado de máquina cumprem a função de gestão de modelos; e a documentação (catálogo de dados, relatório de qualidade, README) cumpre parcialmente a função de base de conhecimento, tornando explícitas as regras de negócio e as decisões técnicas tomadas.
+
+\subsection{Incerteza, evidência e os limites da correlação}
+
+A quantificação da incerteza é tratada a partir de três interpretações de probabilidade --- clássica, frequentista e subjetiva --- e de ferramentas estatísticas descritivas que combinam sempre uma medida de posição (média, mediana) com uma medida de dispersão (desvio padrão, intervalo interquartil), nunca isoladamente, sob pena de comunicar uma falsa certeza sobre o centro da distribuição. Esse princípio orienta a análise estatística deste trabalho, na qual todo teste de diferença de médias (teste \textit{t} de Welch) é acompanhado da respectiva medida de dispersão e do tamanho de amostra.
+
+Um segundo princípio central, discutido por \citet{tukey1977} no contexto da análise exploratória de dados e retomado por \citet{pearl2018} no debate sobre inferência causal, é a distinção entre correlação e causalidade: uma correlação --- ainda que estatisticamente forte --- é suficiente para prever, mas não para intervir. Esse princípio é determinante na interpretação dos resultados da Seção 4: a forte correlação de Spearman encontrada entre desigualdade sustentada e nível final de desenvolvimento humano não autoriza, por si só, a conclusão de que reduzir a desigualdade \textit{causa} o avanço de grupo de IDH, apenas que as duas variáveis se movem de forma consistentemente associada na amostra observada, que é observacional e não experimental.
+
+\subsection{Qualidade de dados e arquitetura em camadas}
+
+A terceira base conceitual trata da preparação dos dados que precede qualquer modelagem, apoiada nas dimensões clássicas de qualidade de dados --- completude, exatidão, consistência, validade, unicidade e atualidade --- amplamente discutidas na literatura de engenharia de dados \citep{han2011,inmon2005,kimball2013}. Essa literatura também distingue valor inválido (fora do domínio declarado, que sempre exige correção) de valor extremo ou \textit{outlier} (raro, mas potencialmente legítimo ou informativo), distinção que foi aplicada diretamente na auditoria de conformidade descrita na Seção 3.2.
+
+A arquitetura de dados em camadas --- camada bruta (nunca modificada), camada tratada (correções documentadas) e camada analítica (fonte única para modelos e painéis) --- é um padrão consolidado na literatura de \textit{data warehousing} \citep{inmon2005,kimball2013} e foi adotada neste trabalho sob a denominação equivalente de \textit{bronze}, \textit{silver} e \textit{gold}, convenção amplamente utilizada em plataformas de dados em nuvem como o Databricks. A modelagem dimensional em esquema estrela, também originária dessa literatura \citep{kimball2013}, foi escolhida por separar claramente dimensões descritivas (país, indicador, ano) de fatos numéricos (valor do indicador), tornando explícita a granularidade do dado --- um aspecto que a literatura de preparação de dados identifica como irreversível: uma vez agregado, o detalhe fino não pode ser recuperado, de modo que a granularidade deve ser definida pela pergunta de negócio, e não pela conveniência de processamento.
+
+Por fim, o tratamento de dados ausentes segue a tipologia de \citet{littlerubin2002}, que recomenda explicitar o mecanismo presumido de ausência antes de escolher entre exclusão, imputação ou codificação por constante. Neste trabalho, a decisão metodológica foi preservar os valores ausentes sem imputação na camada \textit{gold}, de modo a permitir que a própria ausência fosse medida como indicador de qualidade, em vez de ser artificialmente ocultada por um valor substituto.
+
+\section{Métodos}
+
+\subsection{Fonte de dados e desenho do pipeline}
+
+A base de dados utilizada é o conjunto público \textit{Human Development Index --- Full}, publicado pelo PNUD e disponibilizado para uso acadêmico com exigência de citação da fonte. A base original contém 195 países e 880 colunas em formato largo, combinando 35 indicadores de base (IDH, expectativa de vida, anos de escolaridade, renda \textit{per capita}, índices de desigualdade e de gênero, entre outros) distribuídos por aproximadamente 25 a 32 anos de observação (1990--2021).
+
+O pipeline foi construído em três etapas sequenciais, replicáveis tanto em Python/pandas (ambiente local de desenvolvimento e teste) quanto em PySpark sobre Databricks Community Edition (ambiente de persistência em nuvem exigido pela disciplina), com equivalência funcional documentada entre as duas implementações:
+
+\begin{enumerate}
+\item \textbf{Camada \textit{bronze}}: cópia fiel do arquivo CSV original, sem qualquer transformação, preservando a rastreabilidade até a fonte.
+\item \textbf{Camada \textit{silver}}: transformação do formato largo para o formato longo (uma linha por combinação de país, indicador e ano), por meio da extração, via expressão regular, do indicador e do ano a partir do nome de cada coluna original (padrão \texttt{"<Indicador> (<ano>)"}), com conversão de tipos.
+\item \textbf{Camada \textit{gold}}: modelagem dimensional em esquema estrela, com quatro tabelas --- \texttt{dim\_pais} (195 países), \texttt{dim\_indicador} (35 indicadores, com metadados de unidade e categoria), \texttt{dim\_ano} (32 anos) e \texttt{fato\_indicadores} (170.820 observações numéricas, na granularidade de um valor por país, indicador e ano).
+\end{enumerate}
+
+\subsection{Auditoria de qualidade de dados}
+
+Sobre a camada \textit{gold}, foi conduzida uma auditoria quantitativa cobrindo as seis dimensões de qualidade mencionadas na Seção 2.3: completude (proporção de valores preenchidos na tabela fato), unicidade (duplicatas de chave primária nas dimensões e de grão na tabela fato), consistência (integridade referencial entre fato e dimensões), conformidade (aderência ao domínio declarado --- por exemplo, IDH fora do intervalo $[0,1]$ ou expectativa de vida fora de $[0,100]$), acurácia (comparação, como proxy, entre o \textit{ranking} de IDH informado na base e o \textit{ranking} recalculado a partir do próprio valor de IDH) e atualidade (defasagem entre o ano mais recente disponível e o ano de entrega do trabalho).
+
+\subsection{Modelagem analítica}
+
+Duas frentes analíticas foram conduzidas. A primeira retoma o problema de classificação do projeto original: comparar uma regra de decisão tradicional (atribuição direta de grupo de IDH a partir dos limiares oficiais do PNUD: Baixo $<0,550$; Médio $0,550$--$0,699$; Alto $0,700$--$0,799$; Muito Alto $\geq 0,800$) com dois modelos supervisionados --- Regressão Logística e \textit{Random Forest} --- treinados sobre os demais indicadores da base (sem usar o próprio valor do IDH como variável preditora, para evitar vazamento de informação), avaliados por validação cruzada (\textit{k-fold}) e por conjunto de teste independente (\textit{holdout}).
+
+A segunda frente é a extensão proposta neste trabalho: uma análise de mobilidade longitudinal, que classifica cada país em grupo de IDH nos anos de 1990 e de 2021, identifica os países que avançaram de grupo (variável binária \texttt{subiu\_grupo}) e testa a associação entre essa mobilidade e o nível médio de desigualdade do país no período (indicador \textit{Coefficient of human inequality}, médio entre 1990 e 2021). A associação foi testada por duas vias complementares: um teste \textit{t} de Welch (que não assume variâncias iguais entre os grupos de países que avançaram e que não avançaram de grupo) comparando as médias de desigualdade entre os dois grupos, e uma correlação de \textit{Spearman} entre o nível final de IDH (codificado ordinalmente de 0 a 3) e a desigualdade média do país no período --- escolhida por não exigir relação linear nem distribuição normal, apenas monotonicidade.
+
+\section{Resultados}
+
+\subsection{Qualidade dos dados}
+
+A Tabela \ref{tab:qualidade} resume os resultados da auditoria de qualidade sobre a tabela fato (170.820 observações). A completude geral foi de 88,3\% (150.817 valores preenchidos), com os cinco indicadores de menor completude situados entre 74,2\% e 75,0\% --- todos indicadores compostos ou de desigualdade, que exigem maior número de insumos para serem calculados e, portanto, são mais vulneráveis à ausência de algum deles. Não foram encontradas duplicatas de país, nem violações de integridade referencial entre a tabela fato e as dimensões de país, indicador ou ano. Quatro países apresentaram grupo de IDH ausente na dimensão de país --- uma inconsistência pequena, mas registrada explicitamente, em vez de omitida. Nenhum valor de IDH fora do intervalo $[0,1]$ ou de expectativa de vida fora de $[0,100]$ foi identificado, e todos os 195 códigos ISO3 têm formato válido. Como proxy de acurácia, a diferença média absoluta entre o \textit{ranking} de IDH informado e o recalculado foi de apenas 0,19 posições, com um único país apresentando diferença superior a duas posições. O ano mais recente disponível é 2021, implicando defasagem de cinco anos em relação à data de entrega deste trabalho (2026) --- uma limitação relevante para decisões que dependam de dados correntes.
+
+\begin{table}[h]
+\centering
+\caption{Resumo da auditoria de qualidade de dados (tabela fato, $n=170.820$)}
+\label{tab:qualidade}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Dimensão} & \textbf{Resultado} & \textbf{Interpretação} \\
+\midrule
+Completude & 88,3\% preenchido & Boa; menor em índices compostos \\
+Unicidade & 0 duplicatas & Sem redundância estrutural \\
+Consistência & 0 FKs órfãs; 4 grupos ausentes & Integridade referencial íntegra \\
+Conformidade & 0 valores fora do domínio & Sem violação de regra de negócio \\
+Acurácia (proxy) & diferença média de 0,19 posição & Alta fidelidade ao \textit{ranking} oficial \\
+Atualidade & defasagem de 5 anos (até 2021) & Limitação para decisão corrente \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Classificação: regra tradicional versus aprendizado de máquina}
+
+A regra de decisão tradicional, baseada apenas nos limiares oficiais do IDH, obteve acurácia de 69,8\% na tarefa de classificação de grupo de desenvolvimento humano. Os modelos de aprendizado de máquina superaram esse resultado de forma substancial: a \textit{Random Forest} atingiu 86,8\% de acurácia média em validação cruzada e 89,1\% no conjunto de teste independente; a Regressão Logística atingiu 84,8\% no conjunto de teste. O ganho da \textit{Random Forest} sobre a regra tradicional foi de aproximadamente 19,3 pontos percentuais no conjunto de teste, confirmando a primeira hipótese de negócio: o uso de múltiplos indicadores correlacionados ao desenvolvimento humano, combinados por um modelo não linear, discrimina grupos de IDH com mais precisão do que a aplicação isolada do próprio valor do IDH a um limiar fixo --- um resultado que, por si só, levanta uma questão metodológica que o projeto original não discutia explicitamente: o IDH já é, por definição, a variável mais diretamente ligada ao grupo que se busca prever, de modo que o ganho de acurácia mede sobretudo a capacidade do modelo de aproximar, a partir de variáveis correlatas, um resultado que a própria regra tradicional calcula com exatidão quando o valor do IDH está disponível e completo.
+
+\subsection{Mobilidade de grupos de IDH e desigualdade sustentada (1990--2021)}
+
+Entre os 141 países com valor de IDH disponível tanto em 1990 quanto em 2021, 92 (65,2\%) avançaram de grupo de desenvolvimento humano no período, enquanto os demais permaneceram no mesmo grupo ou regrediram. A desigualdade média no período foi de 17,42 pontos entre os países que avançaram de grupo, contra 20,73 pontos entre os que não avançaram --- uma diferença na direção esperada (menor desigualdade associada a maior mobilidade ascendente), mas que, submetida ao teste \textit{t} de Welch, não atingiu significância estatística ao nível convencional de 5\% ($t=-1,750$; $p=0,084$; $n=141$).
+
+Em contraste, a correlação de Spearman entre o nível final de IDH (codificado ordinalmente) e a desigualdade média sustentada ao longo de todo o período foi forte e altamente significativa ($\rho = -0,842$; $p < 0,00001$; $n=132$). A diferença entre os dois resultados --- uma diferença de médias não significativa, mas uma correlação ordinal forte e significativa --- não é uma contradição, mas sim um efeito direto da forma como a mesma pergunta de negócio foi operacionalizada: o teste \textit{t} compara apenas dois grupos (avançou/não avançou), descartando informação sobre a magnitude do nível final, enquanto a correlação utiliza o espectro ordinal completo (Baixo a Muito Alto) e o valor contínuo da desigualdade. Esse contraste reforça, de forma empírica, a distinção entre correlação e causalidade discutida na Seção 2.2: a evidência disponível sustenta a afirmação de que países com desigualdade sustentada mais baixa tendem a ocupar posições mais altas de desenvolvimento humano ao final do período, mas não sustenta, isoladamente, a afirmação causal de que reduzir a desigualdade \textit{provoca} esse avanço --- a amostra é observacional, e fatores de confusão (estabilidade institucional, investimento em saúde e educação, trajetória histórica de renda) não foram controlados nesta análise.
+
+\section{Conclusão}
+
+Este trabalho demonstrou que a reestruturação de uma base de dados pública em arquitetura de camadas e esquema estrela não é apenas um exercício de organização técnica, mas uma condição habilitadora de análises que o formato de origem não permitia realizar --- neste caso, a análise longitudinal de mobilidade entre grupos de desenvolvimento humano. Três conclusões substantivas emergem dos resultados. Primeiro, a qualidade da base é suficientemente alta (88,3\% de completude, zero inconsistências estruturais) para sustentar as análises conduzidas, com a ressalva relevante de que a defasagem de cinco anos entre o último dado disponível (2021) e a data de entrega (2026) limita a aplicabilidade do trabalho a decisões que exijam dados correntes. Segundo, modelos de aprendizado de máquina classificam grupos de desenvolvimento humano com mais acurácia do que uma regra tradicional baseada apenas no valor do IDH, embora esse ganho deva ser interpretado com cautela metodológica, dado que o próprio IDH é definicionalmente próximo da variável que se busca prever. Terceiro, a desigualdade sustentada ao longo de três décadas está fortemente correlacionada ao nível final de desenvolvimento humano de um país, mas essa associação --- estatisticamente robusta quando medida de forma ordinal e contínua --- não resistiu a um teste de diferença de médias entre apenas dois grupos, o que ilustra como a escolha do método estatístico pode alterar a conclusão aparente sobre uma mesma pergunta de negócio, e reforça a necessidade de reportar o resultado completo, inclusive quando ele é estatisticamente fraco, em vez de apenas o resultado que confirma a hipótese inicial.
+
+Como limitações, destacam-se: a análise de mobilidade é observacional, não experimental, de modo que nenhuma relação causal pode ser inferida; a proxy de acurácia utilizada na auditoria de qualidade (comparação de \textit{ranking}) depende da própria base, não de uma fonte externa independente; e a persistência em nuvem (Databricks) depende de execução manual pela autora, não automatizada neste trabalho. Como extensões futuras, recomenda-se: automatizar a verificação de qualidade de dados em cada nova atualização da base (controle de regressão de qualidade); incorporar variáveis de controle (estabilidade institucional, investimento público) na análise de mobilidade, para aproximar-se de uma estimativa causal; e migrar a camada de modelagem preditiva para execução nativa em PySpark sobre Databricks, eliminando a dependência da leitura intermediária em \textit{pandas}.
+
+% ===================== REFERÊNCIAS =====================
+\begin{thebibliography}{99}
+
+\bibitem[Gorry e Scott Morton(1971)]{gorry1971}
+GORRY, G. A.; SCOTT MORTON, M. S. \textbf{A framework for management information systems}. Sloan Management Review, v. 13, n. 1, p. 55--70, 1971.
+
+\bibitem[Han et al.(2011)]{han2011}
+HAN, J.; KAMBER, M.; PEI, J. \textbf{Data Mining: Concepts and Techniques}. 3. ed. Waltham: Morgan Kaufmann, 2011.
+
+\bibitem[Inmon(2005)]{inmon2005}
+INMON, W. H. \textbf{Building the Data Warehouse}. 4. ed. Indianapolis: Wiley, 2005.
+
+\bibitem[Kimball e Ross(2013)]{kimball2013}
+KIMBALL, R.; ROSS, M. \textbf{The Data Warehouse Toolkit}. 3. ed. Indianapolis: Wiley, 2013.
+
+\bibitem[Little e Rubin(2002)]{littlerubin2002}
+LITTLE, R. J. A.; RUBIN, D. B. \textbf{Statistical Analysis with Missing Data}. 2. ed. Hoboken: Wiley, 2002.
+
+\bibitem[Pearl e Mackenzie(2018)]{pearl2018}
+PEARL, J.; MACKENZIE, D. \textbf{The Book of Why: The New Science of Cause and Effect}. New York: Basic Books, 2018.
+
+\bibitem[PNUD(2026)]{pnud}
+PROGRAMA DAS NAÇÕES UNIDAS PARA O DESENVOLVIMENTO (PNUD). \textbf{Human Development Reports --- Data Center}. Disponível em: \url{https://hdr.undp.org/data-center}. Acesso em: 2026.
+
+\bibitem[Simon(1960)]{simon1960}
+SIMON, H. A. \textbf{The New Science of Management Decision}. New York: Harper \& Row, 1960.
+
+\bibitem[Tukey(1977)]{tukey1977}
+TUKEY, J. W. \textbf{Exploratory Data Analysis}. Reading: Addison-Wesley, 1977.
+
+\end{thebibliography}
+
+\end{document}
